@@ -18,5 +18,3 @@ rebuilt and ask you if you want to reload it.
 
 4. This file (readme.txt) must be removed from the project before the debugger
 can be started.
-
-Constructed and soldered a small dual-motor autonomous car that can detect and drive along a black line and maneuver in different shapes specified by the user using embedded systems. The car also has an LCD display that can communicate with the user, as well as two switches on either side so the user can provide inputs on what they want the car to do. Car was programmed in C on the MSP 430 processor; Implemented timers, interrupt service routines, state machines, pulse width modulation to control wheel speed, etc in order to innovate vehicle functionality.

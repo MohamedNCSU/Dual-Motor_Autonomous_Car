@@ -58,11 +58,10 @@ TB1CTL |= ID__2; // Divide clock by 2
 TB1EX0 = TBIDEX__8; // Divide clock by an additional 8
 TB1CCR0 = TB1CCR0_INTERVAL; // CCR0
 TB1CCTL0 |= CCIE; // CCR0 enable interrupt
-
 TB1CCTL0 &= ~CCIFG;
-//TB1CCR1 = TB0CCR1_INTERVAL; // CCR1
-//TB1CCTL1 |= CCIE; // CCR1 enable interrupt
-//TB1CCTL1 &= ~CCIFG; 
+TB1CCR1 = TB0CCR1_INTERVAL; // CCR1
+TB1CCTL1 |= CCIE; // CCR1 enable interrupt
+TB1CCTL1 &= ~CCIFG; 
 // TB0CCR2 = TB0CCR2_INTERVAL; // CCR2
 // TB0CCTL2 |= CCIE; // CCR2 enable interrupt
 // TB0CCTL1 &= ~CCIFG;
@@ -73,17 +72,17 @@ TB1CTL &= ~TBIFG; // Clear Overflow Interrupt flag
 //------------------------------------------------------------------------------
 
 // Timer B2 initialization sets up both B0_0, B0_1-B0_2 and overflow
-/*
+
 void Init_Timer_B2(void) {
 TB2CTL = TBSSEL__SMCLK; // SMCLK source
 TB2CTL |= TBCLR; // Resets TB0R, clock divider, count direction
 TB2CTL |= MC__CONTINOUS; // Continuous up
 TB2CTL |= ID__2; // Divide clock by 2
 TB2EX0 = TBIDEX__8; // Divide clock by an additional 8
-TB2CCR0 = TB0CCR0_INTERVAL; // CCR0
+TB2CCR0 = TB2CCR0_INTERVAL; // CCR0
 TB2CCTL0 |= CCIE; // CCR0 enable interrupt
 TB2CCTL0 &= ~CCIFG;
-TB2CCR1 = TB0CCR1_INTERVAL; // CCR1
+TB2CCR1 = TB2CCR1_INTERVAL; // CCR1
 TB2CCTL1 |= CCIE; // CCR1 enable interrupt
 TB2CCTL1 &= ~CCIFG; 
 // TB0CCR2 = TB0CCR2_INTERVAL; // CCR2
@@ -93,7 +92,7 @@ TB2CTL &= ~TBIE; // Disable Overflow Interrupt
 TB2CTL &= ~TBIFG; // Clear Overflow Interrupt flag
 }
 //------------------------------------------------------------------------------
-*/
+
 void Init_Timer_B3(void) {
 //------------------------------------------------------------------------------
 // SMCLK source, up count mode, PWM Right Side

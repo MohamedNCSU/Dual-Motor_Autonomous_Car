@@ -12,19 +12,14 @@
 #include "macros.h"
 #include  "functions.h"
 #include  "msp430.h"
-extern volatile unsigned int debounce_count1;
-extern volatile unsigned int debounce_count2;
+#include <string.h>
+volatile unsigned int debounce_count11;
+volatile unsigned int debounce_count2;
 extern volatile unsigned char update_display;
 extern int checkswitch1;
 extern int checkswitch2;
 extern unsigned int blink_count;
-char adc_char [4];
-volatile unsigned int ADC_Left_Detect=0;
-volatile unsigned int ADC_Right_Detect=0;
-unsigned int ADC_Thumb;
-unsigned int ADC_Channel;
 extern char display_line[4][11];
-int i;
 extern volatile unsigned char display_changed;
 extern volatile unsigned int detect;
 extern volatile unsigned int linecounter;
@@ -32,65 +27,200 @@ extern volatile unsigned int detect1;
 extern volatile unsigned int linecounter1;
 extern volatile unsigned int detect2;
 extern volatile unsigned int linecounter2;
-
-//-----------------------------------------------------------------
-// Hex to BCD Conversion
-// Convert a Hex number to a BCD for display on an LCD or monitor
-//
-//-----------------------------------------------------------------
-void HEXtoBCD(int hex_value){
-  int value;
-  for(i=0; i < 4; i++) {
-    adc_char[i] = '0';
-  }
-  while (hex_value > 999){
-    hex_value = hex_value - 1000;
-    value = value + 1;
-    adc_char[0] = 0x30 + value;
-  }
-  value = 0;
-  while (hex_value > 99){
-    hex_value = hex_value - 100;
-    value = value + 1;
-    adc_char[1] = 0x30 + value;
-  }
-  value = 0;
-  while (hex_value > 9){
-    hex_value = hex_value - 10;
-    value = value + 1;
-    adc_char[2] = 0x30 + value;
-  }
-  adc_char[3] = 0x30 + hex_value;
-}
-//-----------------------------------------------------------------
-
-//-------------------------------------------------------------
-// ADC Line insert
-// Take the HEX to BCD value in the array adc_char and place it
-// in the desired location on the desired line of the display.
-// char line => Specifies the line 1 thru 4
-// char location => Is the location 0 thru 9
-//
-//-------------------------------------------------------------
-void adc_line(char line, char location){
-  //-------------------------------------------------------------
-  int i;
-  unsigned int real_line;
-  real_line = line;
-  for(i=0; i < 4; i++) {
-    display_line[real_line][i+location] = adc_char[i];
-  }
-  display_changed = INITIAL;
-}
-//-------------------------------------------------------------
+volatile unsigned int detect3;
+volatile unsigned int linecounter3;
+char IOT_2_PC[LARGE_RING_SIZE]; 
+char PC_2_IOT[LARGE_RING_SIZE]; 
+char PC_TEMP[10];
+unsigned int temp;
+volatile unsigned int usb_rx_wr;
+volatile unsigned int direct_usb;
+volatile unsigned int iot_rx_rd;
+volatile unsigned int iot_rx_wr;
+volatile unsigned int transmission;
+extern volatile int update;
+extern volatile unsigned int TXcheck;
+extern volatile unsigned int ready;
+volatile unsigned int temp2;
+unsigned int direct_iot;
+unsigned int A1temp;
+unsigned int dcheck;
+volatile char tempA1;
+volatile unsigned TXA0;
+volatile char tempA0;
+volatile unsigned int iotcma;
+volatile unsigned int iotcmb;
+volatile unsigned int iotcmc;
+volatile unsigned int iotcmd;
+volatile unsigned int debounce_count3;
+volatile unsigned int debounce_count4;
+volatile unsigned int debounce_count5;
+volatile unsigned int debounce_count6;
+volatile unsigned int startup;
+extern volatile unsigned int check1;
+extern volatile unsigned int check2;
+volatile unsigned int SSID;
+volatile unsigned int parse;
+volatile unsigned int IPC;
+volatile unsigned int index;
+extern unsigned int blackline;
+extern unsigned int intercept;
+volatile unsigned int icounter;
+extern volatile char prime;
+volatile unsigned int detect4;
+volatile unsigned int linecounter4;
+volatile unsigned int detect5;
+volatile unsigned int linecounter5;
+extern int timercheck;
+volatile unsigned int displaytime;
+extern volatile int displayflag;
+volatile unsigned int detect6;
+volatile unsigned int linecounter6;
+volatile unsigned int detect7;
+volatile unsigned int linecounter7;
 
 #pragma vector = TIMER0_B0_VECTOR
 __interrupt void Timer0_B0_ISR(void){
   //------------------------------------------------------------------------------
   // TimerB0 0 Interrupt handler
   //-----------------------------------------------------------------------------
-  debounce_count1++;
   TB0CCTL0 &= ~CCIFG; 
+  
+  if(iotcma){
+    debounce_count11++;
+  }
+  /*
+  if(debounce_count11 >=20){
+  RIGHT_FORWARD_SPEED = WHEEL_OFF;
+  LEFT_FORWARD_SPEED = WHEEL_OFF;
+}
+  */
+  
+  debounce_count2++;
+  
+  if(iotcmb){
+    debounce_count3++;
+  }
+  
+  switch(debounce_count3){
+  case 3:
+    RIGHT_REVERSE_SPEED = WHEEL_ON;
+    LEFT_REVERSE_SPEED = WHEEL_ON;
+    break;
+    
+  case 13:
+    RIGHT_REVERSE_SPEED = WHEEL_OFF;
+    LEFT_REVERSE_SPEED = WHEEL_OFF;
+    break;
+    
+  default:break;
+  }
+  
+  if(iotcmc){
+    debounce_count4++;
+  }
+  /*
+  switch(debounce_count4){
+case 3:
+  RIGHT_FORWARD_SPEED = WHEEL_ON;
+  LEFT_REVERSE_SPEED = WHEEL_ON;
+  break;
+case 13:
+  RIGHT_FORWARD_SPEED = WHEEL_OFF;
+  LEFT_REVERSE_SPEED = WHEEL_OFF;
+  break;
+  
+  default: break;
+}
+  */
+  
+  /* if(iotcmd){
+  debounce_count5++;
+}
+  
+  switch(debounce_count5){
+case 20:
+  LEFT_REVERSE_SPEED = 9000;
+  RIGHT_FORWARD_SPEED = 9000;
+  break;
+  
+case 26:
+  LEFT_REVERSE_SPEED = WHEEL_OFF;
+  RIGHT_FORWARD_SPEED = WHEEL_OFF;
+  
+  break;
+  default:break;
+}
+  */
+  
+  if(startup){
+    debounce_count6++;
+  }
+  
+  switch(debounce_count6){
+  case THSEC:
+    strncpy(PC_2_IOT, "AT+CIPMUX=1\r\n",13);
+    UCA0IE |= UCTXIE; // Enable Tx interrupt
+    break;
+  case THSEC1:
+    UCA0IE &= ~UCTXIE;
+    break;
+  case SSEC1:
+    strncpy(PC_2_IOT, "AT+CIPSERVER=1,8389\r\n",22);
+    check2++;
+    UCA0IE |= UCTXIE;
+    break;
+  case SSEC2:
+    UCA0IE &= ~UCTXIE;
+    break;
+  case NSEC2:
+    strncpy(PC_2_IOT, "AT+CWJAP?\r\n",12);
+    UCA0IE |= UCTXIE;
+    break;
+  case NSEC3:
+    UCA0IE &= ~UCTXIE;
+    break;
+  case O23:
+    strncpy(PC_2_IOT, "AT+CIFSR\r\n",11);
+    UCA0IE |= UCTXIE;
+    
+    break;
+  case O24:
+    UCA0IE &= ~UCTXIE;
+    break;
+  case O33:
+    parse++;
+    break;
+    
+  default:break;
+  }
+  
+  
+  
+  
+  //----------------------------------------------------------------------------
+}
+
+#pragma vector=TIMER0_B1_VECTOR
+__interrupt void TIMER0_B1_ISR(void){
+  //----------------------------------------------------------------------------
+  // TimerB0 1-2, Overflow Interrupt Vector (TBIV) handler
+  //----------------------------------------------------------------------------
+  TB0CCTL1 &= ~CCIFG; 
+  update_display = INITIAL;
+  //----------------------------------------------------------------------------
+}
+
+
+#pragma vector = TIMER1_B0_VECTOR
+__interrupt void Timer1_B0_ISR(void){
+  //------------------------------------------------------------------------------
+  // TimerB1 0 Interrupt handler
+  //----------------------------------------------------------------------------
+  
+  TB1CCTL0 &= ~CCIFG;
+  
+  
   if(detect){
     linecounter++;
   }
@@ -102,32 +232,49 @@ __interrupt void Timer0_B0_ISR(void){
   if(detect2){
     linecounter2++;
   }
-  //----------------------------------------------------------------------------
-}
-
-#pragma vector=TIMER0_B1_VECTOR
-__interrupt void TIMER0_B1_ISR(void){
-  //----------------------------------------------------------------------------
-  // TimerB0 1-2, Overflow Interrupt Vector (TBIV) handler
-  //----------------------------------------------------------------------------
-  debounce_count2++;
-  TB0CCTL1 &= ~CCIFG; 
-  update_display = INITIAL;
-  //----------------------------------------------------------------------------
-}
-
-
-#pragma vector = TIMER1_B0_VECTOR
-__interrupt void Timer1_B0_ISR(void){
-//------------------------------------------------------------------------------
-// TimerB1 0 Interrupt handler
-//----------------------------------------------------------------------------
   
-TB1CCTL0 &= ~CCIFG; 
-ADCCTL0 |= ADCENC; // ADC enable conversion.
-ADCCTL0 |= ADCSC; // ADC start conversion.
-
-//----------------------------------------------------------------------------
+  if(detect4){
+    linecounter4++;
+  }
+  
+  if(detect5){
+    linecounter5++;
+  }
+  
+  /*if(detect3){
+  linecounter3++;
+  seconds = linecounter3 % 10;
+  HEXtoBCD(seconds);
+  adc_line(3,6);
+}
+  */
+  
+  
+  /*if(intercept){
+  icounter++;
+  RIGHT_FORWARD_SPEED = 5000;
+  LEFT_FORWARD_SPEED = 5000;
+}
+  
+  if(icounter>20){
+  blackline++;
+  RIGHT_FORWARD_SPEED = WHEEL_OFF;
+  LEFT_FORWARD_SPEED = WHEEL_OFF;
+}
+  
+  
+  if(prime == 'P'){
+  detect3++;
+  if(linecounter3>=20){
+  prime = 'A';
+  
+}
+}
+  */
+  
+  
+  
+  //----------------------------------------------------------------------------
 }
 
 #pragma vector=TIMER1_B1_VECTOR
@@ -135,62 +282,171 @@ __interrupt void TIMER1_B1_ISR(void){
   //----------------------------------------------------------------------------
   // TimerB0 1-2, Overflow Interrupt Vector (TBIV) handler
   //----------------------------------------------------------------------------
- 
+  TB1CCTL1 &= ~CCIFG; 
+  update_display = INITIAL;
   //----------------------------------------------------------------------------
 }
 
+#pragma vector = TIMER2_B0_VECTOR
+__interrupt void Timer2_B0_ISR(void){
+  //------------------------------------------------------------------------------
+  // TimerB1 0 Interrupt handler
+  //----------------------------------------------------------------------------
+  
+  TB2CCTL0 &= ~CCIFG;
+  if(detect3){
+    linecounter3++;
+    displaytime++;
+  }
+  
+  if(detect6){
+    linecounter6++;
+  }
+  
+  if(detect7){
+    linecounter7++;
+  }
+  
+  
+  //----------------------------------------------------------------------------
+}
 
-#pragma vector=ADC_VECTOR
-__interrupt void ADC_ISR(void){
-  switch(__even_in_range(ADCIV,ADCIV_ADCIFG)){
-  case ADCIV_NONE:
-    break;
-  case ADCIV_ADCOVIFG: // When a conversion result is written to the ADCMEM0
-    // before its previous conversion result was read.
-    break;
-  case ADCIV_ADCTOVIFG: // ADC conversion-time overflow
-    break;
-  case ADCIV_ADCHIIFG: // Window comparator interrupt flags
-    break;
-  case ADCIV_ADCLOIFG: // Window comparator interrupt flag
-    break;
-  case ADCIV_ADCINIFG: // Window comparator interrupt flag
-    break;
-  case ADCIV_ADCIFG: // ADCMEM0 memory register with the conversion result
-    ADCCTL0 &= ~ADCENC; // Disable ENC bit.
-    switch (ADC_Channel++){
-    case 0x00: // Channel A2 Interrupt
-      ADCMCTL0 &= ~ADCINCH_2; // Disable Last channel A2
-      ADCMCTL0 |= ADCINCH_3; // Enable Next channel A3
-      ADC_Right_Detect = ADCMEM0; // Move result into Global
-      ADC_Right_Detect = ADC_Right_Detect >> 2; // Divide the result by 4
-      HEXtoBCD(ADC_Right_Detect); // Convert result to String
-      adc_line(0,0); // Place String in Display
-      break;
-    case 0x01:
-      ADCMCTL0 &= ~ADCINCH_3; // Disable Last channel A3
-      ADCMCTL0 |= ADCINCH_5; // Enable Next channel A5
-      ADC_Left_Detect = ADCMEM0; // Move result into Global
-      ADC_Left_Detect = ADC_Left_Detect >> 2; // Divide the result by 4
-      HEXtoBCD(ADC_Left_Detect); // Convert result to String
-      adc_line(0,5); // Place String in Display
-      break;
-    case 0x02:
-      ADCMCTL0 &= ~ADCINCH_5; // Disable Last channel A5
-      ADCMCTL0 |= ADCINCH_2; // Enable Next channel A2
-      ADC_Thumb = ADCMEM0; // Move result into Global
-      ADC_Thumb = ADC_Thumb >> 2; // Divide the result by 4
-      HEXtoBCD(ADC_Thumb); // Convert result to String
-      adc_line(1,0); // Place String in Display
-      break;
-    case 0x03:
-      ADC_Channel = 0;
-      break;
-    default:
-      break;
+#pragma vector=TIMER2_B1_VECTOR
+__interrupt void TIMER2_B1_ISR(void){
+  //----------------------------------------------------------------------------
+  // TimerB0 1-2, Overflow Interrupt Vector (TBIV) handler
+  //----------------------------------------------------------------------------
+  TB2CCTL1 &= ~CCIFG; 
+  update_display = INITIAL;
+  //----------------------------------------------------------------------------
+}
+
+#pragma vector=EUSCI_A0_VECTOR
+__interrupt void eUSCI_A0_ISR(void){
+  //-----------------------------------------------------------------------------
+  // Echo back RXed character, confirm TX buffer is ready first
+  switch(__even_in_range(UCA0IV,0x08)){
+  case 0: break; // Vector 0 - no interrupt
+  case 2:{ // Vector 2 - RXIFG
+    temp = iot_rx_wr++;
+    IOT_2_PC[temp] = UCA0RXBUF;
+    //IOT_2_PC[temp] = tempA0; // Rx -> IOT_2_PC character array
+    
+    if(IOT_2_PC[temp] == '\n'){
+      TXA0 = INITIAL;
     }
     
-  default:
-    break;
+    if(IOT_2_PC[temp] == 'G'){
+      startup = INITIAL;
+    }
+    
+    if(IOT_2_PC[temp] == '"'){
+      SSID = INITIAL;
+    }    
+    
+    
+    
+    if (iot_rx_wr >= (sizeof(IOT_2_PC))){
+      iot_rx_wr = BEGINNING; // Circular buffer back to beginning
+    }
+    
+    UCA1IE |= UCTXIE; // Enable Tx interrupt
+  }
+  break;
+  
+  case 4:{ // Vector 4 - TXIFG
+    
+    if(PC_2_IOT[direct_iot] == '^'){
+      UCA0IE &= ~UCTXIE;
+    }
+    
+    
+    UCA0TXBUF = PC_2_IOT[direct_iot++];
+    
+    if (direct_iot >= (sizeof(PC_2_IOT))){
+      direct_iot = BEGINNING;
+    }
+    if (direct_iot == usb_rx_wr){
+      UCA0IE &= ~UCTXIE; // Disable TX interrupt
+    }
+  }
+  break;
+  
+  default: break;
+  }
+  //------------------------------------------------------------------------------
+}
+
+#pragma vector=EUSCI_A1_VECTOR
+__interrupt void eUSCI_A1_ISR(void){
+  //------------------------------------------------------------------------------
+  // Echo back RXed character, confirm TX buffer is ready first
+  switch(__even_in_range(UCA1IV,0x08)){
+  case 0: break; // Vector 0 - no interrupt
+  case 2:{ // Vector 2 - RXIFG
+    temp = usb_rx_wr++;
+    PC_2_IOT[temp] = UCA1RXBUF; // Rx -> PC_2_IOT character array
+    
+    if(PC_2_IOT[temp] == '\n'){
+      TXcheck = INITIAL;
+    }
+    
+    
+    
+    if (usb_rx_wr >= (sizeof(PC_2_IOT))){
+      usb_rx_wr = BEGINNING; // Circular buffer back to beginning
+    }
+    UCA0IE |= UCTXIE; // Enable Tx interrupt
+  }
+  break;
+  
+  case 4:{ // Vector 4 - TXIFG
+    
+    tempA1 = IOT_2_PC[direct_usb++];
+    
+    UCA1TXBUF = tempA1;
+    
+    
+    if (direct_usb >= (sizeof(IOT_2_PC))){
+      direct_usb = BEGINNING; // Circular buffer back to beginning
+    }
+    
+    unsigned int temp1 = direct_usb;
+    if (temp1 == iot_rx_wr){
+      UCA1IE &= ~UCTXIE; // Disable TX interrupt
+    }
+    
+  }
+  break;
+  
+  default: break;
+  }
+  //------------------------------------------------------------------------------
+}
+
+#pragma vector=PORT4_VECTOR
+__interrupt void switchP4_interrupt(void){
+  // Switch 1
+  if(P4IN & SW1){
+    if (P4IFG & SW1) {
+      P4IFG &= ~SW1; // IFG SW1 cleared
+      P2IN &= ~SW2;
+      startup=RESET_STATE;
+      debounce_count6=RESET_STATE;
+    }
   }
 }
+
+
+#pragma vector=PORT2_VECTOR
+__interrupt void switchP2_interrupt(void){
+  // Switch 2
+  if (P2IN & SW2){
+    if (P2IFG & SW2) {
+      P2IFG &= ~SW2; // IFG SW2 cleared
+      P4IN &= ~SW1;
+    }
+  }
+}
+
+

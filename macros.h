@@ -13,6 +13,9 @@
 #define NONE ('N')
 #define STRAIGHT ('L')
 #define CIRCLE ('C')
+#define NEXTCIRCLE ('D')
+#define TRAVEL ('T')
+#define NEXTTRAVEL ('Q')
 #define FIGURE_8 ('G')
 #define TRIANGLE ('T')
 #define CW ('A')
@@ -29,16 +32,14 @@
 #define LEFT_COUNT_TIME (12) // prev 73
 #define TRAVEL_DISTANCE (5) //PREV 6
 #define WAITING2START (50)
-//#define CIRCLE_TRAVEL_DISTANCE (5)
-//#define CIRCLE_WHEEL_COUNT_TIME (20)
-//#define CIRCLE_RIGHT_COUNT_TIME (19)
-//#define CIRCLE_LEFT_COUNT_TIME (19)
+
 #define PRESSED (0)
 #define RELEASED (1)
 #define NOT_OKAY (0)
 #define OKAY (1)
 #define DEBOUNCE_TIME (10)
 #define DEBOUNCE_RESTART (0)
+
 #define CIRCLE_TRAVEL_DISTANCE (16)
 #define CIRCLE_WHEEL_COUNT_TIME (51)
 #define CIRCLE_RIGHT_COUNT_TIME (50)
@@ -66,15 +67,54 @@
 #define LEFT_REVERSE_SPEED (TB3CCR4)
 
 #define WHEEL_PERIOD (40000) // prev 37000
-#define WHEEL_ON (4500) // prev 4800
-#define RIGHT_ON (3000) //prev 3400
-#define LEFT_ON (3000) // prev 3430
+#define WHEEL_ON (7500) // prev 4800
+#define RIGHT_ON (6000) //prev 3400
+#define LEFT_ON (6000) // prev 3430
 #define WHEEL_OFF (0)
 #define THREEK (4000)
-#define BLACKLINE (120) // prev 250
-#define BLACKLINEWHEEL (430)
+#define BLACKLINE (600) // prev 250, 125
+#define BLACKLINEWHEEL (300)
 #define LINE_INTERVAL_CHECK (30)
-
+#define FASTWHEEL (13200)
+#define SLOWWHEEL (5900)
+#define BEGINNING (0)
+#define INTERCEPTWHEEL (6105)
+#define TURNFAST (11000)
+#define BC (6300)
+#define O5 (15)
+#define FIVESEC (50)
+#define SEVSEC (70)
+#define TK (10000)
+#define CR (6800)
+#define CS (5100)
+#define FIVEF (54)
+#define FOF (45)
+#define LF (10910)
+#define RF (10820)
+#define THSEC (30)
+#define THSEC1 (31)
+#define SSEC1 (61)
+#define SSEC2 (62)
+#define SSEC3 (63)
+#define SSEC5 (65)
+#define NSEC2 (92)
+#define NSEC3 (93)
+#define O23 (123)
+#define O24 (124)
+#define O33 (133)
+#define EE (88)
+#define IPSIZE (21)
+#define IPSIZEMINUSONE (20)
+#define LARGE_RING_SIZE (128)
+#define BUCOS16 (17)
+#define CUCOS16 (52)
+#define TWOWHEEL (2)
+#define THMS (3)
+#define QUAD (4)
+#define FIFTHPOS (5)
+#define SIZEDISPLAY (11)
+#define SIZEDISPLAY1 (10)
+#define OVERSIZE (12)
 #define ALWAYS                  (1)
 #define RESET_STATE             (0)
 #define RED_LED              (0x01) // RED LED 0
@@ -87,8 +127,11 @@
 
 #define TB0CCR0_INTERVAL (50000)
 #define TB0CCR1_INTERVAL (50000)
-#define TB1CCR0_INTERVAL (2500)
+#define TB1CCR0_INTERVAL (50000)
 #define TB1CCR1_INTERVAL (50000)
+#define TB2CCR0_INTERVAL (50000)
+#define TB2CCR1_INTERVAL (2500)
+
 #define CNTR__2 (32768)
 #define CNTR__10 (6553)
 #define INITIAL (1)

@@ -59,9 +59,12 @@ P2SEL1 &= ~SW2; // SW2 Operation
 P2OUT |= SW2; // Configure pullup resistor
 P2DIR &= ~SW2; // Direction = input
 P2REN |= SW2; // Enable pullup resistor
+P2IES |= SW2; // P4.2 Hi/Lo edge interrupt
+P2IFG &= ~SW2; // Clear all P2.6 interrupt flags
+P2IE |= SW2; // P4.2 interrupt enabled
 P2SEL0 &= ~IOT_RUN_CPU; // IOT_RUN_CPU GPIO operation
 P2SEL1 &= ~IOT_RUN_CPU; // IOT_RUN_CPU GPIO operation
-P2OUT &= ~IOT_RUN_CPU; // Initial Value = Low / Off
+P2OUT |= IOT_RUN_CPU; // Initial Value = Low / Off
 P2DIR |= IOT_RUN_CPU; // Direction = input
 P2SEL0 &= ~DAC_ENB; // DAC_ENB GPIO operation
 P2SEL1 &= ~DAC_ENB; // DAC_ENB GPIO operation
@@ -103,9 +106,13 @@ void Init_Port3(void){
   
   P3SEL0 &= ~IOT_LINK_CPU;
   P3SEL1 &= ~IOT_LINK_CPU;
+  P3OUT &= ~IOT_LINK_CPU;
+  P3DIR |= IOT_LINK_CPU;
   
-  P3SEL0 |= IOT_EN_CPU;
+  P3SEL0 &= ~IOT_EN_CPU;
   P3SEL1 &= ~IOT_EN_CPU;
+  P3OUT &= ~IOT_EN_CPU;
+  P3DIR |= IOT_EN_CPU;
 
 }
 
@@ -123,9 +130,9 @@ P4SEL1 &= ~SW1; // SW1 GPIO operation
 P4OUT |= SW1; // Configure pullup resistor
 P4DIR &= ~SW1; // Direction = input
 P4REN |= SW1; // Enable pullup resistor
-// P4IES |= SW1; // P4.2 Hi/Lo edge interrupt
-// P4IFG &= ~SW1; // Clear all P2.6 interrupt flags
-// P4IE |= SW1; // P4.2 interrupt enabled
+P4IES |= SW1; // P4.2 Hi/Lo edge interrupt
+P4IFG &= ~SW1; // Clear all P2.6 interrupt flags
+P4IE |= SW1; // P4.2 interrupt enabled
 P4SEL0 |= UCA1TXD; // USCI_A1 UART operation
 P4SEL1 &= ~UCA1TXD; // USCI_A1 UART operation
 P4SEL0 |= UCA1RXD; // USCI_A1 UART operation
@@ -158,7 +165,7 @@ P5SELC |= V_3_3;
 
 P5SEL0 &= ~IOT_BOOT_CPU;
 P5SEL1 &= ~IOT_BOOT_CPU;
-P5OUT &= ~IOT_BOOT_CPU;
+P5OUT |= IOT_BOOT_CPU;
 P5DIR |= IOT_BOOT_CPU;
 
 }
@@ -200,7 +207,7 @@ P6DIR |= P6_5;
 
 P6SEL0 &= ~GRN_LED;
 P6SEL1 &= ~GRN_LED;
-P6OUT |= GRN_LED;
+P6OUT &= ~GRN_LED;
 P6DIR |= GRN_LED;
 }
 

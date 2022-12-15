@@ -12,13 +12,15 @@
 #include "macros.h"
 #include  "functions.h"
 #include  "msp430.h"
-
-void Init_Conditions(void);
-void Init_LEDs(void);
+#include <string.h>
 
 extern char display_line[4][11];
 extern char *display[4];
 extern volatile unsigned char update_display;
+extern volatile unsigned char display_changed;
+
+void Init_Conditions(void);
+void Init_LEDs(void);
 
 void Init_Conditions(void){
 //------------------------------------------------------------------------------
@@ -46,6 +48,7 @@ void Init_Conditions(void){
   enable_interrupts();
 //------------------------------------------------------------------------------
 }
+
 
 void Init_LEDs(void){
 //------------------------------------------------------------------------------
@@ -99,6 +102,8 @@ ADCIE |= ADCIE0; // Enable ADC conv complete interrupt
 ADCCTL0 |= ADCENC; // ADC enable conversion.
 ADCCTL0 |= ADCSC; // ADC start conversion.
 }
+
+
 
 
 
